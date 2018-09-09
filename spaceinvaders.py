@@ -1,18 +1,30 @@
+#initialising system library allowing parameters and function
 import sys
+#initialising os to cooperate with underlying OS such as window, mac or linux
 import os
+#initialising random library
 import random
+#initialising turtle library for making the boarders 
 import turtle
+#initialising math library for collision detection
 import math
 
 #setting up screen
 wn = turtle.Screen()
 wn.bgcolor("black")
 wn.title("Space Invaders")
+wn.bgpic("spacebg.gif")
+
+#registering the shapes for players and enemies
+turtle.register_shape("invader.gif")
+turtle.register_shape("player.gif")
+
 
 #draw border
 border = turtle.Turtle()
 border.speed(0)
 border.color("white")
+
 
 #setting up position
 border.penup()
@@ -20,16 +32,32 @@ border.setposition(-300,-300)
 border.pendown()
 border.pensize(3)
 
+
 #drawing square
 for side in range(4):
     border.fd(600)
     border.lt(90)
 border.hideturtle()
 
+
+#setting the scoreboard
+score = 0
+
+#drawing the scoreboard
+scoreboard = turtle.Turtle()
+scoreboard.speed(0)
+scoreboard.color("white")
+scoreboard.penup()
+scoreboard.setposition(-290, 280)
+scorestring = "Score: %s" %score
+scoreboard.write(scorestring, False, align = "left", font = ("Arial", 14, "normal"))
+scoreboard.hideturtle()
+
+
 #create the player turtle
 player = turtle.Turtle()
 player.color("blue")
-player.shape("triangle")
+player.shape("player.gif")
 player.penup()
 player.speed(0)
 player.setposition(0, -250)
@@ -41,7 +69,7 @@ playerspeed = 15
 
 
 #choose number of enemy
-numenemy = 5
+numenemy = 8
 
 #create empty list
 enemyarray = []
@@ -55,7 +83,7 @@ for i in range(numenemy):
 #creating attributes and position for enemies
 for enemy in enemyarray:
     enemy.color("red")
-    enemy.shape("circle")
+    enemy.shape("invader.gif")
     enemy.penup()
     enemy.speed(0)
     x = random.randint(-200, 200)
@@ -71,7 +99,7 @@ enemyspeed = 2
 #create bullet
 bullet = turtle.Turtle()
 bullet.color("yellow")
-bullet.shape("circle")
+bullet.shape("triangle")
 bullet.penup()
 bullet.speed(0)
 bullet.setheading(90)
@@ -178,12 +206,19 @@ while True:
             y = random.randint(100, 250)
             enemy.setposition(x, y)
 
+            #update score when we hit enemy
+            score += 1
+            scorestring = "Score: %s" %score
+            scoreboard.clear()
+            scoreboard.write(scorestring, False, align = "left", font = ("Arial", 14, "normal"))
+
         #checking collision between player and enemy
         if collision(player, enemy):
             player.hideturtle()
             enemy.hideturtle()
-            break
             print("Gamer Over")
+            break
+            
 
     #move bullet if its in fire state
     if bulletstate == "fire":
