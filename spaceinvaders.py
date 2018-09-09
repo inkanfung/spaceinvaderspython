@@ -36,28 +36,36 @@ player.setposition(0, -250)
 player.setheading(90)
 
 
+#initiating player speed
 playerspeed = 15
 
 
 #choose number of enemy
 numenemy = 5
+
 #create empty list
 enemyarray = []
 
 
-#add enemies to the 
+#add enemies to the array creating mutlitple enemies
 for i in range(numenemy):
     enemyarray.append(turtle.Turtle())
 
-#creating enemy
-enemy.color("red")
-enemy.shape("square")
-enemy.penup()
-enemy.speed(0)
-enemy.setposition(-200, 250)
+
+#creating attributes and position for enemies
+for enemy in enemyarray:
+    enemy.color("red")
+    enemy.shape("circle")
+    enemy.penup()
+    enemy.speed(0)
+    x = random.randint(-200, 200)
+    y = random.randint(100, 250)
+    enemy.setposition(x, y)
 
 
+#initiating enemy speed
 enemyspeed = 2
+
 
 
 #create bullet
@@ -66,10 +74,14 @@ bullet.color("yellow")
 bullet.shape("circle")
 bullet.penup()
 bullet.speed(0)
+bullet.setheading(90)
 bullet.shapesize(0.5,0.5)
 bullet.hideturtle()
 
+
+#initiating bullet speed
 bulletspeed = 20
+
 
 #defining the bullet states
 #ready to fire state
@@ -79,7 +91,6 @@ bulletstate = "ready"
 
 
 #moving player left and right
-
 def move_left():
     x = player.xcor()
     x -= playerspeed
@@ -119,32 +130,60 @@ def collision(t1, t2):
         return False
 
     
+
 #create keyboard bindings
 turtle.listen()
 turtle.onkey(move_left, "Left")
 turtle.onkey(move_right, "Right")
 turtle.onkey(firebullet, "space")
 
+
+
 #main gameloop
 while True:
 
-    #move enemy
-    x = enemy.xcor()
-    x += enemyspeed
-    enemy.setx(x)
+    for enemy in enemyarray:
+        #move enemy alternating xcor
+        x = enemy.xcor()
+        x += enemyspeed
+        enemy.setx(x)
 
-    #reverse if enemy hits border
-    if enemy.xcor() > 280:
-        y = enemy.ycor()
-        y -= 20
-        enemyspeed *= -1
-        enemy.sety(y)
+        #reverse if enemy hits border
+        if enemy.xcor() > 280:
+            #move all enemies across
+            for e in enemyarray:
+                y = e.ycor()
+                y -= 40
+                e.sety(y)
+            #change enemy direction
+            enemyspeed *= -1
 
-    if enemy.xcor() < -280:
-        y = enemy.ycor()
-        y -= 20
-        enemyspeed *= -1
-        enemy.sety(y)
+        if enemy.xcor() < -280:
+            #move all enemies down
+            for e in enemyarray:
+                y = e.ycor()
+                y -= 40
+                e.sety(y)
+            #change enemies direction
+            enemyspeed *= -1
+
+        #checking collion between bullet and enemy
+        if collision(bullet,enemy):
+            #reset bullet
+            bullet.hideturtle()
+            bulletstate = "ready"
+            bullet.setposition(0, -400)
+            #reset enemy
+            x = random.randint(-200, 200)
+            y = random.randint(100, 250)
+            enemy.setposition(x, y)
+
+        #checking collision between player and enemy
+        if collision(player, enemy):
+            player.hideturtle()
+            enemy.hideturtle()
+            break
+            print("Gamer Over")
 
     #move bullet if its in fire state
     if bulletstate == "fire":
@@ -157,20 +196,7 @@ while True:
         bullet.hideturtle()
         bulletstate = "ready"
 
-    #checking collion between bullet and enemy
-    if collision(bullet,enemy):
-        #reset bullet
-        bullet.hideturtle()
-        bulletstate = "ready"
-        bullet.setposition(0, -400)
-        #reset enemy
-        enemy.setposition(-200,250)
-
-    #checking collision between player and enemy
-    player.hideturtle()
-    enemy.hideturtle()
-    print("Gamer Over")
-    break
+    
 
 
 
